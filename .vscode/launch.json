@@ -1,0 +1,16 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+         {
+              "name": "Worth Trust APIs",
+              "type": "python",
+              "request": "launch",
+              "module": "main",
+              "justMyCode": false,
+              "cwd":"${workspaceFolder}/app",
+              "env": {
+              "PYTHONPATH": "${workspaceFolder}"
+              }
+         }
+    ]
+}
