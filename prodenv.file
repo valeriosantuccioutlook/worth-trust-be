@@ -1,0 +1,7 @@
+# PROD ENV vars TRAEFIK basic auth
+
+# user name
+USER_NAME=user_name
+
+# user has psw
+USER_PASSWORD=$$apr1$$jIKW.bdS$$eKXe4Lxjgy/rH65wP1iQe1
