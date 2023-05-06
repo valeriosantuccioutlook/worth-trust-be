@@ -13,7 +13,10 @@ permissions:
 jobs:
   CI:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v3
@@ -42,13 +45,27 @@ jobs:
       run: python -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
+      # Formatting
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Ruff
+      uses: chartboost/ruff-action@v1
+      with:
+        src: "./src"
+        version: 0.0.259
+        args: --select B
+    - name: runner / black formatter
+      steps:
+        - uses: actions/checkout@v2
+        - uses: rickstaa/action-black@v1
+          with:
+            black_args: ". --check"
 
+      # UNIT TESTS
       #TODO: Integrate unit tests
       # - name: Run Tests   
       #   # Note that you have to activate the virtualenv in every step
