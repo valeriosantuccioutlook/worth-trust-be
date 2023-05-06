@@ -77,11 +77,9 @@ jobs:
         version: 0.0.259
         args: --select B
     - name: runner / black formatter
-      steps:
-      - uses: actions/checkout@v2
-      - uses: rickstaa/action-black@v1
-          with:
-            black_args: ". --check"
+      uses: rickstaa/action-black@v1
+      with:
+        black_args: ". --check"
 
       # UNIT TESTS
       #TODO: Integrate unit tests
