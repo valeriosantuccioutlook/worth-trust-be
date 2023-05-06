@@ -11,4 +11,3 @@ repos:
     hooks:
     -   id: black
         exclude: tests/
-        args: [--check]
