@@ -19,21 +19,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
+        # Ruff
       - name: Ruff linting
         uses: chartboost/ruff-action@v1
-        with:
-            src: "./src"
-            version: 0.0.259
-            args: --select B
-
+        # Black
       - name: Black formatting
         uses: psf/black@stable
         with:
-            options: "--check --verbose"
-            src: "./src"
-            jupyter: true
-            version: "21.5b1"
+          black_args: ". --check --verbose"
 
   CI:
     needs: pre-commit
