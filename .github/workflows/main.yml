@@ -18,9 +18,14 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-    - uses: pre-commit/action@v3.0.0
+    - name: Checkout
+      uses: actions/checkout@v3
+      # Setup Python
+    - name: Setup up Python
+      uses: actions/setup-python@v3
+      # Flake8 pre commit
+    - name: Pre-commit all files
+      uses: pre-commit/action@v3.0.0
       with:
         extra_args: flake8 --all-files
 
