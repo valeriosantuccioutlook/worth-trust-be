@@ -72,3 +72,15 @@ def create_new_user(
         User: User created.
     """
     return corefuncs.create_new_user(user, session)
+
+
+@router.get(
+    "/foo",
+    description="Foo",
+)
+@manage_transaction
+def foo() -> Dict:
+    """
+    Just Foo to trigger Actions.
+    """
+    return {"Foo": 200}
