@@ -10,7 +10,7 @@ SessionLocal: Session = sessionmaker(autocommit=False, autoflush=True, bind=engi
 Base = declarative_base()
 
 
-def get_db():
+def get_db() -> Session:
     db = SessionLocal()
     try:
         yield db

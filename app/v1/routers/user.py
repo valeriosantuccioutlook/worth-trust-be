@@ -1,73 +1,74 @@
 from typing import Annotated, Dict
 
 from fastapi import APIRouter, Body, Depends
-from fastapi.exceptions import HTTPException
-from sqlalchemy.exc import IntegrityError
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from starlette import status
 
 from ...core.datamodels.user import BaseUser
+from ...core.datamodels.useraccess import Token, UserMe
 from ...core.models.database import User
 from ...core.settings import get_db
+from .. import corefuncs
+from ..dependencies import get_current_active_user
+from ..utils import manage_transaction
 
 router = APIRouter()
 
 
-@router.get("/user", description="Get user")
-def get_user(
+@router.get("/user", response_model=UserMe)
+def get_current_user_info(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> UserMe:
+    """
+    Returns current active user info.
+
+    Args:
+        :current_user (Annotated[User, Depends): Active user.
+
+    Returns:
+        UserMe: response model.
+    """
+    return current_user
+
+
+@router.post("/token", response_model=Token)
+@manage_transaction
+def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: Session = Depends(get_db),
+) -> Token:
+    """
+    Create login access token for the current active user.
+
+    Args:
+        :form_data (Annotated[OAuth2PasswordRequestForm, Depends): OAuth2 standard
+        form data payload.
+        :session (Session, optional): SQLAlchemy transaction session.
+
+    Returns:
+        Token: access token.
+    """
+    return corefuncs.login_for_access_token(session, form_data)
+
+
+@router.post(
+    "/user",
+    description="Add new `user`.",
+    status_code=201,
+)
+@manage_transaction
+def create_new_user(
+    user: Annotated[BaseUser, Body(..., embed=False)],
     session: Session = Depends(get_db),
 ) -> Dict:
-    """_summary_
+    """
+    Add new user in `user` table.
 
     Args:
-        session (Session, optional): _description_. Defaults to Depends(get_db).
-
-    Raises:
-        HTTPException: _description_
-        Exception: _description_
+        :user (BaseUser). User content needed to perform insert.
+        :session (Session). SQLAlchemy transaction session. Defaults to Depends(get_db).
 
     Returns:
-        Dict: _description_
+        User: User created.
     """
-    try:
-        return {"ok": 200}
-    except (ValueError, TypeError) as e:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, e.args)
-    except IntegrityError as e:
-        raise HTTPException(status.HTTP_409_CONFLICT, e.args)
-    except KeyError as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, e.args)
-    except Exception as e:
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, e.args)
-
-
-@router.post("/user", description="Add user", status_code=201)
-def ceate_user(
-    user: Annotated[BaseUser, Body(..., embed=True)],
-    session: Session = Depends(get_db),
-) -> int:
-    """_summary_
-
-    Args:
-        session (Session, optional): _description_. Defaults to Depends(get_db).
-
-    Raises:
-        HTTPException: _description_
-        Exception: _description_
-
-    Returns:
-        Dict: _description_
-    """
-    try:
-        session.add(User(**dict(user)))
-        session.flush()
-        session.commit()
-        return status.HTTP_201_CREATED
-    except (ValueError, TypeError) as e:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, e.args)
-    except IntegrityError as e:
-        raise HTTPException(status.HTTP_409_CONFLICT, e.args)
-    except KeyError as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, e.args)
-    except Exception as e:
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, e.args)
+    return corefuncs.create_new_user(user, session)

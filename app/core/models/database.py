@@ -36,6 +36,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     hashed_psw: Mapped[str] = mapped_column(nullable=False)
     disabled: Mapped[bool] = mapped_column(nullable=False, default=False)
+    username: Mapped[str] = mapped_column(nullable=False, unique=True)
 
     # many-to-many relationship to Company, bypassing the `UserCompany` class
     companies: Mapped[List["Company"]] = relationship(
