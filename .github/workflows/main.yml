@@ -51,7 +51,7 @@ jobs:
       # Set env if does not exist yet
     - name: Set up virtual ENV
       uses: actions/cache@v2
-      id: cache-env
+      id: cache-venv
       with:
         path: venv
         key: ${{runner.os}}-venv-${{hashFiles('**/requirements.txt')}}
