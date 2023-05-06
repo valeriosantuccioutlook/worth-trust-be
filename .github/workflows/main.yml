@@ -12,17 +12,17 @@ permissions:
 
 jobs:
   pre-commit:
-      runs-on: ${{matrix.os}}
-      strategy:
-        matrix:
-          os: [ubuntu-latest, windows-latest, macOS-latest]
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
 
-      steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      - uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: flake8 --all-files
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: flake8 --all-files
 
   CI:
     needs: pre-commit
