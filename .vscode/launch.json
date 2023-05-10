@@ -11,6 +11,17 @@
               "env": {
               "PYTHONPATH": "${workspaceFolder}"
               }
-         }
+         },
+         {
+          "name": "Worth Trust APIs: Tests",
+          "type": "python",
+          "justMyCode": false,
+          "request": "launch",
+          "module": "pytest",
+          "cwd":"${workspaceFolder}/app",
+              "env": {
+              "PYTHONPATH": "${workspaceFolder}"
+              }
+      }
     ]
 }

@@ -1,22 +1,16 @@
 import random
 import string
-from datetime import timedelta
-from typing import Annotated
+from datetime import datetime
 
-from fastapi import Depends
-from fastapi.exceptions import HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette import status
 
-from ..config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..core.datamodels.user import BaseUser, BaseUserUsername
-from ..core.datamodels.useraccess import Token
 from ..core.models.database import User
-from .dependencies import authenticate_user, create_access_token, pwd_context
+from .dependencies import create_access_token, pwd_context
 
 
-def create_new_user(user: BaseUser, session: Session) -> User:
+def create_new_user(user: BaseUser, session: Session) -> BaseUserUsername:
     """
     Insert new user into `users` table.
 
@@ -34,40 +28,34 @@ def create_new_user(user: BaseUser, session: Session) -> User:
         return "".join(random.choice(chars) for _ in range(size))
 
     user: BaseUserUsername = BaseUserUsername(
-        **dict(user), username=_username_generator()
+        **dict(user),
+        username=_username_generator(),
+        updated_at=datetime.now(),
+        created_at=datetime.now(),
+        auth_x_token=None,
+        verified=False
     )
+    user.name = user.name.upper()
+    user.surname = user.surname.upper()
     user.hashed_psw = pwd_context.hash(user.hashed_psw)
+    access_token = create_access_token({"sub": user.username})
+    user.auth_x_token = access_token
     session.add(User(**dict(user)))
-    response = user.dict(exclude={"hashed_psw"})
-    return response
+    session.flush()
+    session.commit()
+    return user
 
 
-def login_for_access_token(
-    session: Session, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-) -> Token:
+def disable_user(user: User) -> status.HTTP_202_ACCEPTED:
     """
-    Create new login access token for the current active user.
+    Disable user.
 
     Args:
-        :session (Session, optional): SQLAlchemy transaction session.
-        :form_data (Annotated[OAuth2PasswordRequestForm, Depends): OAuth2 standard
-        form data payload.
-
-    Raises:
-        HTTPException: Handled exception: not authenticated.
+        :user (User): Current active user to make inactive.
 
     Returns:
-        Token: access token.
+        status.HTTP_202_ACCEPTED: Accepted.
     """
-    user = authenticate_user(session, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+    user.disabled = True
+    return status.HTTP_202_ACCEPTED
+    return status.HTTP_202_ACCEPTED

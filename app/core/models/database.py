@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from uuid import UUID, uuid4
 
@@ -7,8 +8,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..settings import Base
 
 
-class UserCompany(Base):
-    __tablename__ = "users_companies"
+class Application(Base):
+    __tablename__ = "applications"
 
     user_guid: Mapped[UUID] = mapped_column(ForeignKey("users.guid"), primary_key=True)
     company_guid: Mapped[UUID] = mapped_column(
@@ -19,10 +20,10 @@ class UserCompany(Base):
     joboffer_location: Mapped[str] = mapped_column(nullable=False)
     hired: Mapped[bool] = mapped_column(nullable=True, default=False)
 
-    # association between UserCompany -> User
-    user: Mapped["User"] = relationship(back_populates="users_companies")
+    # association between Application -> User
+    user: Mapped["User"] = relationship(back_populates="applications")
     # association between Company -> User
-    company: Mapped["Company"] = relationship(back_populates="users_companies")
+    company: Mapped["Company"] = relationship(back_populates="applications")
 
 
 class User(Base):
@@ -37,13 +38,17 @@ class User(Base):
     hashed_psw: Mapped[str] = mapped_column(nullable=False)
     disabled: Mapped[bool] = mapped_column(nullable=False, default=False)
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
+    auth_x_token: Mapped[str] = mapped_column(nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(nullable=False)
+    verified: Mapped[bool] = mapped_column(nullable=False, default=False)
 
-    # many-to-many relationship to Company, bypassing the `UserCompany` class
+    # many-to-many relationship to Company, bypassing the `Application` class
     companies: Mapped[List["Company"]] = relationship(
-        secondary="users_companies", back_populates="users"
+        secondary="applications", back_populates="users"
     )
-    # association between User -> UserCompany -> Company
-    users_companies: Mapped[List["UserCompany"]] = relationship(back_populates="user")
+    # association between User -> Application -> Company
+    applications: Mapped[List["Application"]] = relationship(back_populates="user")
 
 
 class Company(Base):
@@ -56,11 +61,9 @@ class Company(Base):
     location: Mapped[str] = mapped_column(nullable=False)
     linkedin_link: Mapped[str] = mapped_column(nullable=False, unique=True)
 
-    # many-to-many relationship to User, bypassing the `UserCompany` class
+    # many-to-many relationship to User, bypassing the `Application` class
     users: Mapped[List["User"]] = relationship(
-        secondary="users_companies", back_populates="companies"
+        secondary="applications", back_populates="companies"
     )
-    # association between Company -> UserCompany -> User
-    users_companies: Mapped[List["UserCompany"]] = relationship(
-        back_populates="company"
-    )
+    # association between Company -> Application -> User
+    applications: Mapped[List["Application"]] = relationship(back_populates="company")

@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, StrictStr
+from pydantic import BaseModel, EmailStr, Field, StrictBool, StrictStr
 
 
 class BaseUser(BaseModel):
@@ -18,6 +19,10 @@ class BaseUser(BaseModel):
 
 class BaseUserUsername(BaseUser):
     username: StrictStr = Field(alias="username")
+    updated_at: datetime = Field(alias="updated_at")
+    created_at: datetime = Field(alias="created_at")
+    auth_x_token: StrictStr | None = Field(alias="auth_x_token")
+    verified: StrictBool = Field(alias="verified")
 
 
 class BaseCompany(BaseModel):

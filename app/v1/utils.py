@@ -31,6 +31,8 @@ def manage_transaction(func) -> Any:
                     raise HTTPException(status.HTTP_409_CONFLICT, e.args)
                 except KeyError as e:
                     raise HTTPException(status.HTTP_400_BAD_REQUEST, e.args)
+                except HTTPException as e:
+                    raise e
                 except Exception as e:
                     raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, e.args)
         except HTTPException as httpexc:
