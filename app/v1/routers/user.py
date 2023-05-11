@@ -108,13 +108,17 @@ async def create_user(
     Returns:
         UserMe: Basic user info.
     """
-    user = corefuncs.create_new_user(user_form, session)
-    access_token = create_access_token({"sub": user.username})
-    user.auth_x_token = access_token
-    url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{user.auth_x_token}"
-    sender = Email(user, url)
-    await sender.send_verification_code()
-    return UserMe(**user.dict())
+    try:
+        user = corefuncs.create_new_user(user_form, session)
+        access_token = create_access_token({"sub": user.username})
+        user.auth_x_token = access_token
+        sender = Email(user, request)
+        await sender.send_verification_code()
+        session.commit()
+        return UserMe(**user.dict())
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=e.args)
 
 
 @router.get(

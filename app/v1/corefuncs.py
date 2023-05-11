@@ -42,7 +42,6 @@ def create_new_user(user: BaseUser, session: Session) -> BaseUserUsername:
     user.auth_x_token = access_token
     session.add(User(**dict(user)))
     session.flush()
-    session.commit()
     return user
 
 

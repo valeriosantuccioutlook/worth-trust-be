@@ -1,27 +1,19 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
 from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2.environment import Template
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from starlette import status
 
-from ..config import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    ALGORITHM,
-    EMAIL_FROM,
-    EMAIL_HOST,
-    EMAIL_PASSWORD,
-    EMAIL_PORT,
-    EMAIL_USERNAME,
-    SECRET_KEY,
-)
+from ..config import _settings
 from ..core.datamodels.useraccess import Token, TokenData
 from ..core.models.database import User
 from ..core.settings import get_db
@@ -35,35 +27,38 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class Email:
+    _MSG: str = "WorthTrust email verification"
+    _sender: str = f"WorthTrust <{_settings.EMAIL_FROM}>"
+
     def __init__(
         self,
         user: User,
-        url: str,
+        request: Request,
     ):
         self.user = user
-        self.sender = "WorthTrust <admin@admin.com>"
         self.email = [EmailStr(self.user.email)]
-        self.url = url
+        self.request = request
+        self.url = f"{self.request.base_url}verifyemail/{self.user.auth_x_token}"
 
     async def send_email(
         self,
         subject: str,
-        template: str,
+        template_name: str,
     ):
         # Define the config
         conf = ConnectionConfig(
-            MAIL_USERNAME=EMAIL_USERNAME,
-            MAIL_PASSWORD=EMAIL_PASSWORD,
-            MAIL_FROM=EMAIL_FROM,
-            MAIL_PORT=int(EMAIL_PORT),
-            MAIL_SERVER=EMAIL_HOST,
+            MAIL_USERNAME=_settings.EMAIL_USERNAME,
+            MAIL_PASSWORD=_settings.EMAIL_PASSWORD,
+            MAIL_FROM=self._sender,
+            MAIL_PORT=_settings.EMAIL_PORT,
+            MAIL_SERVER=_settings.EMAIL_HOST,
             MAIL_STARTTLS=False,
             MAIL_SSL_TLS=False,
             USE_CREDENTIALS=True,
             VALIDATE_CERTS=True,
         )
         # Generate the HTML template base on the template name
-        template = env.get_template(f"{template}.html")
+        template: Template = env.get_template(f"{template_name}.html")
         html = template.render(url=self.url, first_name=self.user.name, subject=subject)
 
         # Define the message options
@@ -76,7 +71,7 @@ class Email:
         await fm.send_message(message)
 
     async def send_verification_code(self):
-        await self.send_email("WorthTrust email verification", "verification")
+        await self.send_email(self._MSG, "verification")
 
 
 def authenticate_user(
@@ -110,7 +105,9 @@ def create_access_token(
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, _settings.SECRET_KEY, algorithm=_settings.ALGORITHM
+    )
     return encoded_jwt
 
 
@@ -124,7 +121,9 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, _settings.SECRET_KEY, algorithms=[_settings.ALGORITHM]
+        )
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -169,7 +168,7 @@ def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token_expires = timedelta(minutes=_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
