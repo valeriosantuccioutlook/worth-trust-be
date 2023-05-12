@@ -1,0 +1,27 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+         {
+              "name": "Worth Trust APIs",
+              "type": "python",
+              "request": "launch",
+              "module": "main",
+              "justMyCode": false,
+              "cwd":"${workspaceFolder}/app",
+              "env": {
+              "PYTHONPATH": "${workspaceFolder}"
+              }
+         },
+         {
+          "name": "Worth Trust APIs: Tests",
+          "type": "python",
+          "justMyCode": false,
+          "request": "launch",
+          "module": "pytest",
+          "cwd":"${workspaceFolder}/app",
+              "env": {
+              "PYTHONPATH": "${workspaceFolder}"
+              }
+      }
+    ]
+}
