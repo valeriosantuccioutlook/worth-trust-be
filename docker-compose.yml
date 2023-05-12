@@ -10,6 +10,7 @@ services:
       - 8000
     env_file:
       - env.file
+      - secrets.file
     depends_on:
       - postgres
     labels:
@@ -24,6 +25,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - env.file
+      - secrets.file
     expose:
       - 5432
     networks:
