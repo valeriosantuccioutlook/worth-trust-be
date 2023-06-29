@@ -12,7 +12,5 @@ def test_add_user_entity(session: Session):
     """
     session.add(BASE_USER)
     session.commit()
-    added_user = (
-        session.query(User).filter(User.username == BASE_USER.username).one_or_none()
-    )
+    added_user = session.query(User).filter(User.email == BASE_USER.email).one_or_none()
     assert added_user == BASE_USER
