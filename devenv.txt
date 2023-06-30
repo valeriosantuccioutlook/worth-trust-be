@@ -5,7 +5,7 @@ ENVIRON=DEV
 DB_USER=postgres
 DB_NAME=postgres
 DB_PORT=5432
-DB_HOST=postgres
+DB_HOST=localhost
 
 # EMAIL SENDER
 EMAIL_HOST=sandbox.smtp.mailtrap.io
