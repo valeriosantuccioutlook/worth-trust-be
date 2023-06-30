@@ -48,9 +48,6 @@ jobs:
       EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
       EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
       SECRET_KEY: ${{secrets.SECRET_KEY}}
-
-      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
-
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_PASSWORD: password
@@ -73,6 +70,9 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+    - name: Create and populate .env file
+      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
+
     - name: Check out repository code
       uses: actions/checkout@v3
 
