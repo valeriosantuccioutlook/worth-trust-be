@@ -8,10 +8,9 @@ class UserAccess(BaseUser):
 
 
 class UserMe(BaseModel):
-    name: StrictStr = Field(alias="name")
-    surname: StrictStr = Field(alias="surname")
-    email: StrictStr = Field(alias="email")
-    username: StrictStr = Field(alias="username")
+    given_name: StrictStr = Field(...)
+    last_name: StrictStr = Field(...)
+    email: StrictStr = Field(...)
 
     class Config:
         orm_mode = True

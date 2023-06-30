@@ -59,7 +59,9 @@ class Email:
         )
         # Generate the HTML template base on the template name
         template: Template = env.get_template(f"{template_name}.html")
-        html = template.render(url=self.url, first_name=self.user.name, subject=subject)
+        html = template.render(
+            url=self.url, first_name=self.user.given_name.upper(), subject=subject
+        )
 
         # Define the message options
         message = MessageSchema(
@@ -76,10 +78,10 @@ class Email:
 
 def authenticate_user(
     session: Session,
-    username: str,
+    email: str,
     password: str,
 ) -> User:
-    user: User = get_user(session, username)
+    user: User = get_user(session, email)
     if user is None:
         return False
     if not pwd_context.verify(password, user.hashed_psw):
@@ -89,9 +91,9 @@ def authenticate_user(
 
 def get_user(
     session: Session,
-    username: str,
+    email: str,
 ) -> User | None:
-    user = session.query(User).filter(User.username == username).one_or_none()
+    user = session.query(User).filter(User.email == email).one_or_none()
     return user
 
 
@@ -124,13 +126,13 @@ def get_current_user(
         payload = jwt.decode(
             token, _settings.SECRET_KEY, algorithms=[_settings.ALGORITHM]
         )
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
-        TokenData(username=username)
+        TokenData(username=email)
     except JWTError:
         raise credentials_exception
-    user: User = get_user(session, username)
+    user: User = get_user(session, email)
     if user is None:
         raise credentials_exception
     return user
@@ -170,6 +172,6 @@ def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}

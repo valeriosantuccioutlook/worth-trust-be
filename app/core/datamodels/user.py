@@ -1,15 +1,21 @@
 from datetime import datetime
-from typing import List, Optional
-from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, StrictBool, StrictStr
 
 
 class BaseUser(BaseModel):
-    name: StrictStr = Field(alias="user_name")
-    surname: StrictStr = Field(alias="user_surname")
-    email: EmailStr = Field(alias="user_email")
-    hashed_psw: StrictStr = Field(alias="user_psw")
+    given_name: StrictStr = Field(...)
+    second_name: StrictStr = Field(None)
+    last_name: StrictStr = Field(...)
+    email: EmailStr = Field(...)
+    hashed_psw: StrictStr = Field(alias="password")
+    city: StrictStr = Field(...)
+    country: StrictStr = Field(...)
+    address: StrictStr = Field(None)
+    zip_code: StrictStr = Field(...)
+    birthday: StrictStr = Field(None)
+    phone_numb_prefix: StrictStr = Field(None)
+    phone_numb: StrictStr = Field(None)
 
     class Config:
         orm_mode = True
@@ -17,29 +23,12 @@ class BaseUser(BaseModel):
         arbitrary_types_allowed = True
 
 
-class BaseUserUsername(BaseUser):
-    username: StrictStr = Field(alias="username")
-    updated_at: datetime = Field(alias="updated_at")
-    created_at: datetime = Field(alias="created_at")
+class UserBody(BaseUser):
+    updated_at: datetime = Field(...)
+    created_at: datetime = Field(...)
     auth_x_token: StrictStr | None = Field(alias="auth_x_token")
-    verified: StrictBool = Field(alias="verified")
+    verified: StrictBool = Field(...)
 
 
-class BaseCompany(BaseModel):
-    guid: Optional[UUID] = Field(alias="company_guid")
-    name: StrictStr = Field(alias="company_name")
-    location: StrictStr = Field(alias="company_location")
-    linkedin_link: StrictStr = Field(alias="company_linkedin_link")
-
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-
-
-class UserSchema(BaseUser):
-    companies: Optional[List[BaseCompany]]
-
-
-class CompanySchema(BaseCompany):
+class UserLinked(BaseModel):
     pass

@@ -46,7 +46,7 @@ def get_current_user_info(
 
 @router.post("/token", response_model=Token, status_code=status.HTTP_202_ACCEPTED)
 @manage_transaction
-def login__access_token(
+def login_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Session = Depends(get_db),
 ) -> Token:
@@ -79,10 +79,10 @@ def disable_user(
 
     Args:
         :session (Session, optional): SQLAlchemy transaction session.
-        :user (Annotated[User, Depends): _description_
+        :user (Annotated[User, Depends): Active user.
 
     Returns:
-        int: _description_
+        int: HTTP status code.
     """
     return corefuncs.disable_user(user)
 
@@ -110,7 +110,7 @@ async def create_user(
     """
     try:
         user = corefuncs.create_new_user(user_form, session)
-        access_token = create_access_token({"sub": user.username})
+        access_token = create_access_token({"sub": user.email})
         user.auth_x_token = access_token
         sender = Email(user, request)
         await sender.send_verification_code()
@@ -174,7 +174,7 @@ async def resend_email_verification(
         :session (Session, optional): SQLAlchemy transaction session.
 
     Returns:
-        int: Accepted request.
+        int: HTTP status code.
     """
     acces_token = create_access_token({"sub": user.username})
     user.auth_x_token = acces_token

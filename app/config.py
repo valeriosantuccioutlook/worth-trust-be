@@ -1,7 +1,10 @@
 import os
 from functools import lru_cache
 
+from dotenv import load_dotenv
 from pydantic import BaseSettings
+
+load_dotenv()
 
 STAGING = "STAGING"
 DEV = "DEV"
@@ -59,7 +62,7 @@ class StagingSettings(BaseSettings):
     DB_URI: str
 
     class Config:
-        env_file = "env.file"
+        env_file = "stagingenv.file"
 
     @property
     def DB_URI(cls) -> str:
