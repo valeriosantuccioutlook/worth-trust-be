@@ -51,9 +51,9 @@ jobs:
 
       run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
 
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: 5432
-      POSTGRES_PASSWORD: ${{secrets.DB_PSW}}
+      POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
 
     services:
@@ -63,12 +63,12 @@ jobs:
         image: postgres:15-alpine
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: ${{secrets.DB_PSW}}
+          POSTGRES_PASSWORD: password
           POSTGRES_USER: postgres
           POSTRES_DB: postgres
         ports:
           # Maps tcp port DB_PORT on service container to the host
-          - 8000:8000
+          - 5432:5432
         # Set health checks to wait until postgres has started
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
