@@ -12,6 +12,7 @@ permissions:
 
 env:
   DB_URI: ${{secrets.DB_URI}}
+  ENVIRON: DEV
 jobs:
   pre-commit:
     runs-on: ${{matrix.os}}
