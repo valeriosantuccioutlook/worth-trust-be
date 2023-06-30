@@ -39,6 +39,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
+    timeout-minutes: 800
 
     env:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
