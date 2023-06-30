@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "SETTING ENV..."
 # Create .env file
 touch .env
 
@@ -20,3 +21,5 @@ echo "DB_PSW="$DB_PSW >> .env
 echo "EMAIL_PASSWORD="$EMAIL_PASSWORD >> .env
 echo "EMAIL_USERNAME="$EMAIL_USERNAME >> .env
 echo "SECRET_KEY="$SECRET_KEY >> .env
+
+echo "DONE"
