@@ -12,7 +12,6 @@ permissions:
 
 # Create and populate .env file
 env:
-  ENVIRON: DEV
   ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
   ALGORITHM: ${{secrets.ALGORITHM}}
   DB_PSW: ${{secrets.DB_PSW}}
@@ -21,7 +20,7 @@ env:
   SECRET_KEY: ${{secrets.SECRET_KEY}}
 
   name: Create and populate .env file
-  run: chmod +x initenv.sh && ./initenv.sh
+  run: chmod +x initenv.sh && ./initenv.sh && cat .env
 
 
 jobs:
