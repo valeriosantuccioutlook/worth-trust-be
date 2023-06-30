@@ -1,7 +1,8 @@
 from sqlalchemy.orm.session import Session
-from tests.settings import BASE_USER
 
 from app.core.models.database import User
+
+from ..settings import BASE_USER
 
 
 def test_add_user_entity(session: Session):

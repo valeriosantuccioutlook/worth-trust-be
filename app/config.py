@@ -1,7 +1,10 @@
 import os
 from functools import lru_cache
 
+from dotenv import load_dotenv
 from pydantic import BaseSettings
+
+load_dotenv()
 
 STAGING = "STAGING"
 DEV = "DEV"
