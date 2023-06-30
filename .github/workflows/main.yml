@@ -21,7 +21,7 @@ env:
   SECRET_KEY: ${{secrets.SECRET_KEY}}
 
   name: Create and populate .env file
-  run: chmod +x inienv.sh && ./initenv.sh
+  run: chmod +x initenv.sh && ./initenv.sh
 
 
 jobs:
