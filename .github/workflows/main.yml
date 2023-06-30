@@ -33,12 +33,39 @@ jobs:
           options: "--check --verbose"
           src: "."
 
-  SET_ENV:
+  CI:
     needs: PRE-COMMIT
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
+
+    env:
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
+      ALGORITHM: ${{secrets.ALGORITHM}}
+      DB_PSW: ${{secrets.DB_PSW}}
+      EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
+      EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
+      SECRET_KEY: ${{secrets.SECRET_KEY}}
+
+      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
+    
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: ${DB_PSW}
+          POSTGRES_HOST: ${DB_HOST}
+          POSTGRES_PORT: ${DB_PORT}
+          POSTRES_DB: ${DB_NAME}
+        ports:
+          # Maps tcp port DB_PORT on service container to the host
+          - ${DB_PORT}:${DB_PORT}
+        # Set health checks to wait until postgres has started
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
     - uses: actions/checkout@v3
@@ -67,66 +94,9 @@ jobs:
       run: python -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
     
-        # Create and populate .env file
-    - name: Create and populate .env file
-      env:
-        ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
-        ALGORITHM: ${{secrets.ALGORITHM}}
-        DB_PSW: ${{secrets.DB_PSW}}
-        EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
-        EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
-        SECRET_KEY: ${{secrets.SECRET_KEY}}
-      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
-
-  
-  CI:
-    needs: SET_ENV
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-    
-    services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
-        image: postgres
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: ${DB_PSW}
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port DB_PORT on service container to the host
-          - ${DB_PORT}:${DB_PORT}
-
-    steps:
-      # Downloads a copy of the code in your repository before running CI tests
-      - name: Check out repository code
-        uses: actions/checkout@v3
-
-      # Performs a clean installation of all dependencies in the `package.json` file
-      # For more information, see https://docs.npmjs.com/cli/ci.html
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Connect to PostgreSQL
-        # Runs a script that creates a PostgreSQL table, populates
-        # the table with data, and then retrieves the data
-        run: node client.js
-        # Environment variables used by the `client.js` script to create
-        # a new PostgreSQL table.
-        env:
-          # The hostname used to communicate with the PostgreSQL service container
-          POSTGRES_HOST: ${DB_HOST}
-          # The default PostgreSQL port
-          POSTGRES_PORT: ${DB_PORT}
-
-        # UNIT TESTS
-        #TODO: Integrate unit tests
-      - name: Run Tests
-        run: . venv/bin/activate && pytest
+    - name: Check out repository code
+      uses: actions/checkout@v3
+        
+      # Run tests
+    - name: Run Tests
+      run: . venv/bin/activate && pytest
