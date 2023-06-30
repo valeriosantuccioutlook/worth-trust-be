@@ -76,7 +76,7 @@ jobs:
         EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
         EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
         SECRET_KEY: ${{secrets.SECRET_KEY}}
-      run: chmod +x initenv.sh && ./initenv.sh && cat .env
+      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
 
       # UNIT TESTS
       #TODO: Integrate unit tests
