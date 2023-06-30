@@ -51,19 +51,19 @@ jobs:
 
       run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
 
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${{secrets.DB_PSW}}
       POSTGRES_USER: postgres
 
     services:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres
+        image: postgres:15-alpine
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: password
+          POSTGRES_PASSWORD: ${{secrets.DB_PSW}}
           POSTGRES_USER: postgres
           POSTRES_DB: postgres
         ports:
