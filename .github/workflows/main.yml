@@ -10,18 +10,6 @@ on:
 permissions:
   contents: read
 
-# Create and populate .env file
-env:
-  ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
-  ALGORITHM: ${{secrets.ALGORITHM}}
-  DB_PSW: ${{secrets.DB_PSW}}
-  EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
-  EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
-  SECRET_KEY: ${{secrets.SECRET_KEY}}
-
-  name: Create and populate .env file
-  run: chmod +x initenv.sh && ./initenv.sh && cat .env
-
 
 jobs:
   pre-commit:
@@ -78,6 +66,17 @@ jobs:
     - name: Activate Virtual ENV
       run: python -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
+    
+        # Create and populate .env file
+    - name: Create and populate .env file
+      env:
+        ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
+        ALGORITHM: ${{secrets.ALGORITHM}}
+        DB_PSW: ${{secrets.DB_PSW}}
+        EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
+        EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
+        SECRET_KEY: ${{secrets.SECRET_KEY}}
+      run: chmod +x initenv.sh && ./initenv.sh && cat .env
 
       # UNIT TESTS
       #TODO: Integrate unit tests
