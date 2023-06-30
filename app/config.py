@@ -62,7 +62,7 @@ class StagingSettings(BaseSettings):
     DB_URI: str
 
     class Config:
-        env_file = "env.file"
+        env_file = "stagingenv.file"
 
     @property
     def DB_URI(cls) -> str:

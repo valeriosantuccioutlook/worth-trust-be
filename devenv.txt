@@ -1,0 +1,13 @@
+# Set ENV
+ENVIRON=DEV
+
+# DB
+DB_USER=postgres
+DB_NAME=postgres
+DB_PORT=5432
+DB_HOST=localhost
+
+# EMAIL SENDER
+EMAIL_HOST=sandbox.smtp.mailtrap.io
+EMAIL_PORT=587
+EMAIL_FROM=admin@admin.com
