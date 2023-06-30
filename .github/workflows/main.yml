@@ -70,9 +70,6 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - name: Create and populate .env file
-      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
-
     - name: Check out repository code
       uses: actions/checkout@v3
 
@@ -99,6 +96,10 @@ jobs:
     - name: Activate Virtual ENV
       run: python -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
+        
+      # Config ENV
+    - name: Create and populate .env file
+      run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
         
       # Run tests
     - name: Run Tests
