@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
-    timeout-minutes: 800
+    timeout-minutes: 3200
 
     env:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
@@ -51,7 +51,7 @@ jobs:
 
       run: chmod +x initenv.sh && ./initenv.sh && echo "Composed .env file:" && cat .env
 
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: 5432
       POSTGRES_PASSWORD: ${{secrets.DB_PSW}}
       POSTGRES_USER: postgres
