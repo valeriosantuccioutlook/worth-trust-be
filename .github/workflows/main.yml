@@ -67,12 +67,13 @@ jobs:
           POSTRES_DB: postgres
         ports:
           # Maps tcp port DB_PORT on service container to the host
-          - 5432_5432
+          - 5432:5432
         # Set health checks to wait until postgres has started
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out repository code
+      uses: actions/checkout@v3
 
       # Install python 3.11
     - name: Set up Python 3.11
@@ -97,9 +98,6 @@ jobs:
     - name: Activate Virtual ENV
       run: python -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
-    
-    - name: Check out repository code
-      uses: actions/checkout@v3
         
       # Run tests
     - name: Run Tests
