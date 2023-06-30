@@ -55,7 +55,7 @@ jobs:
       POSTGRES_PORT: 5432
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
-    
+
     services:
       # Label used to access the service container
       postgres:
