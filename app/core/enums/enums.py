@@ -10,3 +10,9 @@ class RequestStatus(Enum):
 class AdType(Enum):
     SERVICE: str = "service"
     ITEM: str = "item"
+
+
+class Currency(Enum):
+    EUR: str = "€"
+    GBP: str = "£"
+    USD: str = "$"

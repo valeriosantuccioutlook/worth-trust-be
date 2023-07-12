@@ -7,9 +7,9 @@ from ..settings import BASE_USER
 
 def test_add_user_entity(session: Session):
     """
-    Test DB user.
+    Test DB `user`.
 
-    - populate DB with "TEST" user.
+    - populate DB with "TEST" `user`.
     """
     session.add(BASE_USER)
     session.commit()

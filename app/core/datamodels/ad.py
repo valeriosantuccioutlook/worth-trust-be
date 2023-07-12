@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, StrictFloat, StrictStr
 
-from ..enums.enums import AdType
+from ..enums.enums import AdType, Currency
 
 
 class BaseAd(BaseModel):
@@ -12,6 +12,7 @@ class BaseAd(BaseModel):
     description: StrictStr = Field(None)
     value_estimation: StrictFloat = Field(...)
     ad_type: AdType = Field(...)
+    currency: Currency = Field(...)
 
     class Config:
         orm_mode = True

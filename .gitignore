@@ -158,3 +158,5 @@ cython_debug/
 # Misc
 *.file
 test.db
+migrations
+*alembic*

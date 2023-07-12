@@ -6,7 +6,7 @@ from sqlalchemy import BinaryExpression, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.session import Session
 
-from ..enums.enums import AdType, RequestStatus
+from ..enums.enums import AdType, Currency, RequestStatus
 from ..settings import Base
 
 
@@ -66,6 +66,7 @@ class Ad(Base):
     description: Mapped[str] = mapped_column(nullable=True)
     value_estimation: Mapped[float] = mapped_column(nullable=False)
     ad_type: Mapped[AdType] = mapped_column(nullable=False)
+    currency: Mapped[Currency] = mapped_column(nullable=False)
 
     # many-to-many relationship to User, bypassing the `Request` class
     users: Mapped[List["User"]] = relationship(
